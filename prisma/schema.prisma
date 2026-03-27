@@ -1,0 +1,293 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── AUTH ───────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+
+  cefrLevel CefrLevel @default(A1)
+  dailyGoal Int       @default(10)
+  uiLanguage String   @default("vi")
+  timezone   String   @default("Asia/Ho_Chi_Minh")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  wordProgress  UserWordProgress[]
+  streak        Streak?
+  dailySessions DailySession[]
+  favorites     FavoriteWord[]
+  savedWords    SavedWord[]
+  wordLists     WordList[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ─── WORD DATA ──────────────────────────────────────────
+
+model Word {
+  id           String       @id @default(cuid())
+  word         String
+  phonetic     String?
+  partOfSpeech PartOfSpeech
+  cefrLevel    CefrLevel
+
+  definitionEn    String
+  translationVi   String
+  exampleSentence String
+  exampleVi       String?
+
+  topicId   String?
+  topic     Topic?  @relation(fields: [topicId], references: [id])
+  frequency Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userProgress UserWordProgress[]
+  favorites    FavoriteWord[]
+  savedBy      SavedWord[]
+  listItems    WordListItem[]
+  wordOfDay    WordOfDay[]
+
+  @@unique([word, partOfSpeech])
+  @@index([cefrLevel])
+  @@index([topicId])
+  @@index([frequency])
+  @@map("words")
+}
+
+model Topic {
+  id     String  @id @default(cuid())
+  name   String  @unique
+  nameVi String
+  icon   String?
+  words  Word[]
+
+  @@map("topics")
+}
+
+// ─── LEARNING PROGRESS (SM-2) ───────────────────────────
+
+model UserWordProgress {
+  id     String @id @default(cuid())
+  userId String
+  wordId String
+
+  easeFactor  Float @default(2.5)
+  interval    Int   @default(0)
+  repetitions Int   @default(0)
+
+  nextReviewAt   DateTime  @default(now())
+  lastReviewedAt DateTime?
+
+  timesCorrect Int        @default(0)
+  timesWrong   Int        @default(0)
+  status       WordStatus @default(NEW)
+  notes        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word Word @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+  @@index([userId, nextReviewAt])
+  @@index([userId, status])
+  @@map("user_word_progress")
+}
+
+// ─── DAILY TRACKING ─────────────────────────────────────
+
+model DailySession {
+  id     String   @id @default(cuid())
+  userId String
+  date   DateTime @db.Date
+
+  wordsLearned  Int     @default(0)
+  wordsReviewed Int     @default(0)
+  timeSpentSec  Int     @default(0)
+  goalMet       Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_sessions")
+}
+
+model Streak {
+  id String @id @default(cuid())
+  userId String @unique
+
+  currentStreak  Int      @default(0)
+  longestStreak  Int      @default(0)
+  lastActiveDate DateTime @db.Date
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("streaks")
+}
+
+// ─── FAVORITES & SAVED ──────────────────────────────────
+
+model FavoriteWord {
+  id     String @id @default(cuid())
+  userId String
+  wordId String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word Word @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+  @@map("favorite_words")
+}
+
+model SavedWord {
+  id     String @id @default(cuid())
+  userId String
+  wordId String
+
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  word Word @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, wordId])
+  @@map("saved_words")
+}
+
+// ─── WORD LISTS (Collections) ───────────────────────────
+
+model WordList {
+  id     String @id @default(cuid())
+  userId String
+  name   String
+  icon   String? @default("📚")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items WordListItem[]
+
+  @@unique([userId, name])
+  @@map("word_lists")
+}
+
+model WordListItem {
+  id     String @id @default(cuid())
+  listId String
+  wordId String
+
+  createdAt DateTime @default(now())
+
+  list WordList @relation(fields: [listId], references: [id], onDelete: Cascade)
+  word Word     @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@unique([listId, wordId])
+  @@map("word_list_items")
+}
+
+// ─── WORD OF THE DAY ────────────────────────────────────
+
+model WordOfDay {
+  id     String   @id @default(cuid())
+  wordId String
+  date   DateTime @db.Date @unique
+
+  createdAt DateTime @default(now())
+
+  word Word @relation(fields: [wordId], references: [id], onDelete: Cascade)
+
+  @@map("word_of_day")
+}
+
+// ─── ENUMS ──────────────────────────────────────────────
+
+enum CefrLevel {
+  A1
+  A2
+  B1
+  B2
+  C1
+}
+
+enum PartOfSpeech {
+  NOUN
+  VERB
+  ADJECTIVE
+  ADVERB
+  PREPOSITION
+  CONJUNCTION
+  PRONOUN
+  INTERJECTION
+  DETERMINER
+  PHRASAL_VERB
+  IDIOM
+}
+
+enum WordStatus {
+  NEW
+  LEARNING
+  REVIEW
+  MASTERED
+}

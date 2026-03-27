@@ -1,0 +1,17 @@
+[
+  { "name": "Greetings", "nameVi": "Chào hỏi", "icon": "👋" },
+  { "name": "Family", "nameVi": "Gia đình", "icon": "👨‍👩‍👧‍👦" },
+  { "name": "Food & Drink", "nameVi": "Đồ ăn & Thức uống", "icon": "🍜" },
+  { "name": "Travel", "nameVi": "Du lịch", "icon": "✈️" },
+  { "name": "Work", "nameVi": "Công việc", "icon": "💼" },
+  { "name": "Health", "nameVi": "Sức khỏe", "icon": "🏥" },
+  { "name": "Shopping", "nameVi": "Mua sắm", "icon": "🛍️" },
+  { "name": "Education", "nameVi": "Giáo dục", "icon": "📚" },
+  { "name": "Technology", "nameVi": "Công nghệ", "icon": "💻" },
+  { "name": "Nature", "nameVi": "Thiên nhiên", "icon": "🌿" },
+  { "name": "Sports", "nameVi": "Thể thao", "icon": "⚽" },
+  { "name": "Entertainment", "nameVi": "Giải trí", "icon": "🎬" },
+  { "name": "Daily Life", "nameVi": "Cuộc sống hàng ngày", "icon": "🏠" },
+  { "name": "Emotions", "nameVi": "Cảm xúc", "icon": "😊" },
+  { "name": "Business", "nameVi": "Kinh doanh", "icon": "📊" }
+]
