@@ -5,43 +5,12 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import bcrypt from "bcryptjs";
 import { db } from "@/server/db";
 
-const useSecureCookies = process.env.NODE_ENV === "production";
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   trustHost: true,
   pages: {
     signIn: "/login",
-  },
-  cookies: {
-    sessionToken: {
-      name: useSecureCookies ? "__Secure-authjs.session-token" : "authjs.session-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: useSecureCookies,
-      },
-    },
-    callbackUrl: {
-      name: useSecureCookies ? "__Secure-authjs.callback-url" : "authjs.callback-url",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: useSecureCookies,
-      },
-    },
-    csrfToken: {
-      name: useSecureCookies ? "__Host-authjs.csrf-token" : "authjs.csrf-token",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: useSecureCookies,
-      },
-    },
   },
   providers: [
     Google({

@@ -94,6 +94,37 @@ export const progressRouter = createTRPCRouter({
       return { success: true, newStatus };
     }),
 
+  getLearnedWords: protectedProcedure
+    .input(z.object({
+      status: z.enum(["ALL", "MASTERED", "LEARNING", "REVIEW", "NEW"]).default("ALL"),
+      page: z.number().min(1).default(1),
+    }))
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id!;
+      const pageSize = 20;
+      const where = {
+        userId,
+        ...(input.status !== "ALL" ? { status: input.status } : {}),
+      };
+
+      const [items, total] = await Promise.all([
+        ctx.db.userWordProgress.findMany({
+          where,
+          include: { word: true },
+          orderBy: { lastReviewedAt: "desc" },
+          take: pageSize,
+          skip: (input.page - 1) * pageSize,
+        }),
+        ctx.db.userWordProgress.count({ where }),
+      ]);
+
+      return {
+        words: items.map((i) => i.word),
+        total,
+        totalPages: Math.ceil(total / pageSize),
+      };
+    }),
+
   getStats: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id!;
 

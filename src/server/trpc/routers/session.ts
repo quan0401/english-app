@@ -4,13 +4,15 @@ import { getDailyWords } from "@/server/services/daily-words";
 import { getSmartSuggestions } from "@/server/services/smart-suggestions";
 
 export const sessionRouter = createTRPCRouter({
-  getDailyWords: protectedProcedure.query(async ({ ctx }) => {
-    const userId = ctx.session.user.id!;
-    const user = await ctx.db.user.findUniqueOrThrow({
-      where: { id: userId },
-    });
-    return getDailyWords(ctx.db, user.id, user.cefrLevel, user.dailyGoal);
-  }),
+  getDailyWords: protectedProcedure
+    .input(z.object({ seed: z.number().optional() }).optional())
+    .query(async ({ ctx }) => {
+      const userId = ctx.session.user.id!;
+      const user = await ctx.db.user.findUniqueOrThrow({
+        where: { id: userId },
+      });
+      return getDailyWords(ctx.db, user.id, user.cefrLevel, user.dailyGoal);
+    }),
 
   getSmartWords: protectedProcedure.query(async ({ ctx }) => {
     const userId = ctx.session.user.id!;

@@ -8,6 +8,7 @@ import { favoritesRouter } from "@/server/trpc/routers/favorites";
 import { wordListsRouter } from "@/server/trpc/routers/wordLists";
 import { gameRouter } from "@/server/trpc/routers/game";
 import { wordOfDayRouter } from "@/server/trpc/routers/wordOfDay";
+import { notionSyncRouter } from "@/server/trpc/routers/notionSync";
 
 export const appRouter = createTRPCRouter({
   word: wordRouter,
@@ -19,6 +20,7 @@ export const appRouter = createTRPCRouter({
   wordLists: wordListsRouter,
   game: gameRouter,
   wordOfDay: wordOfDayRouter,
+  notion: notionSyncRouter,
 });
 
 export type AppRouter = typeof appRouter;

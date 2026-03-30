@@ -22,6 +22,16 @@ model User {
   uiLanguage String   @default("vi")
   timezone   String   @default("Asia/Ho_Chi_Minh")
 
+  // Notion integration
+  notionAccessToken  String?
+  notionWorkspaceId  String?
+  notionPageId       String?
+  notionWordDbId     String?
+  notionListDbId     String?
+  notionProgressDbId String?
+  notionNotesDbId    String?
+  lastNotionSync     DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -92,7 +102,10 @@ model Word {
 
   topicId   String?
   topic     Topic?  @relation(fields: [topicId], references: [id])
-  frequency Int     @default(0)
+  familyId  String?
+  family    WordFamily? @relation(fields: [familyId], references: [id])
+  frequency  Int     @default(0)
+  needsCrawl Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -108,6 +121,14 @@ model Word {
   @@index([topicId])
   @@index([frequency])
   @@map("words")
+}
+
+model WordFamily {
+  id       String @id @default(cuid())
+  rootWord String @unique
+  words    Word[]
+
+  @@map("word_families")
 }
 
 model Topic {
