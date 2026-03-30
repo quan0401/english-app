@@ -50,7 +50,7 @@ export default function ReviewPage() {
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-4 text-center">
         <p className="text-danger">Vui lòng đăng nhập để ôn tập.</p>
-        <Link href="/login" className="mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors">
+        <Link href="/login" className="mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors">
           Đăng nhập
         </Link>
       </div>
@@ -79,7 +79,7 @@ export default function ReviewPage() {
             <p className="text-muted mt-3">Hãy quay lại sau hoặc học thêm từ mới.</p>
           </>
         )}
-        <Link href="/learn" className="mt-6 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors">
+        <Link href="/learn" className="mt-6 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors">
           Học từ mới
         </Link>
       </div>
@@ -116,26 +116,21 @@ export default function ReviewPage() {
           showActions={false}
         />
 
-        {/* Rating buttons */}
+        {/* Swipe hint + auto-advance */}
         <div className="px-6 pb-6">
-          <div className="grid grid-cols-4 gap-2">
-            {[
-              { key: "again" as const, label: "Lại", color: "text-danger" },
-              { key: "hard" as const, label: "Khó", color: "text-warning" },
-              { key: "good" as const, label: "Tốt", color: "text-primary" },
-              { key: "easy" as const, label: "Dễ", color: "text-success" },
-            ].map((btn) => (
-              <button
-                key={btn.key}
-                onClick={() => handleRateCard(btn.key)}
-                className={cn(
-                  "rounded-full bg-card py-3 text-sm font-medium hover:bg-card-hover transition-colors",
-                  btn.color
-                )}
-              >
-                {btn.label}
-              </button>
-            ))}
+          <div className="flex gap-3">
+            <button
+              onClick={() => handleRateCard("again")}
+              className="flex-1 rounded-full bg-card border border-border py-2.5 text-sm font-medium text-danger hover:bg-card-hover transition-colors cursor-pointer"
+            >
+              Chưa biết
+            </button>
+            <button
+              onClick={() => handleRateCard("good")}
+              className="flex-1 rounded-full bg-card border border-border py-2.5 text-sm font-medium text-success hover:bg-card-hover transition-colors cursor-pointer"
+            >
+              Đã biết
+            </button>
           </div>
         </div>
       </div>

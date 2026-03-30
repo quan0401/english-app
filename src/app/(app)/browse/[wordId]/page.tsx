@@ -20,6 +20,7 @@ export default function WordDetailPage() {
 
   const wordQuery = trpc.word.getById.useQuery({ id: wordId });
   const relatedQuery = trpc.word.getRelated.useQuery({ wordId });
+  const familyQuery = trpc.word.getFamily.useQuery({ wordId });
   const progressQuery = trpc.progress.getWordProgress.useQuery({ wordId });
   const { isFavorited, isSaved, toggleFavorite, speak } = useWordActions(wordId);
 
@@ -73,7 +74,7 @@ export default function WordDetailPage() {
       </div>
 
       {/* Main word card */}
-      <div className="rounded-2xl bg-card p-6 space-y-4">
+      <div className="rounded-2xl bg-card border border-border shadow-sm p-6 space-y-4">
         <div className="flex items-center gap-3">
           <button onClick={() => speak(word.word)} className="flex items-center gap-2 rounded-full bg-card-hover px-3 py-1.5 text-sm text-muted hover:text-foreground transition-colors cursor-pointer">
             {word.phonetic && <span>{word.phonetic}</span>}
@@ -102,7 +103,7 @@ export default function WordDetailPage() {
 
       {/* Learning stats */}
       {progress && (
-        <div className="rounded-2xl bg-card p-4 space-y-3">
+        <div className="rounded-2xl bg-card border border-border shadow-sm p-4 space-y-3">
           <h3 className="text-sm font-medium text-muted">Tiến độ học</h3>
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center">
@@ -127,7 +128,7 @@ export default function WordDetailPage() {
       )}
 
       {/* Notes */}
-      <div className="rounded-2xl bg-card p-4 space-y-2">
+      <div className="rounded-2xl bg-card border border-border shadow-sm p-4 space-y-2">
         <h3 className="text-sm font-medium text-muted">Ghi chú của bạn</h3>
         <textarea
           value={notes ?? ""}
@@ -144,9 +145,32 @@ export default function WordDetailPage() {
         {updateNotes.isPending && <p className="text-xs text-muted">Đang lưu...</p>}
       </div>
 
+      {/* Word family */}
+      {familyQuery.data && familyQuery.data.words.length > 1 && (
+        <div className="rounded-2xl bg-card border border-border shadow-sm p-4 space-y-3">
+          <h3 className="text-sm font-medium text-muted">
+            Họ từ <span className="text-primary">({familyQuery.data.rootWord})</span>
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {familyQuery.data.words
+              .filter((w) => w.id !== wordId)
+              .map((w) => (
+              <Link
+                key={w.id}
+                href={`/browse/${w.id}`}
+                className="rounded-xl bg-primary/10 border border-primary/20 px-3 py-2 text-sm hover:bg-primary/20 transition-colors"
+              >
+                <span className="font-medium text-primary">{w.word}</span>
+                <span className="text-xs text-muted ml-1">({posLabels[w.partOfSpeech] ?? w.partOfSpeech})</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Related words */}
       {relatedQuery.data && relatedQuery.data.length > 0 && (
-        <div className="rounded-2xl bg-card p-4 space-y-3">
+        <div className="rounded-2xl bg-card border border-border shadow-sm p-4 space-y-3">
           <h3 className="text-sm font-medium text-muted">Từ liên quan</h3>
           <div className="flex flex-wrap gap-2">
             {relatedQuery.data.map((w) => (

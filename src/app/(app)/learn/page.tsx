@@ -8,10 +8,13 @@ import Link from "next/link";
 export default function LearnPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [seed, setSeed] = useState(() => Date.now());
 
-  const dailyWords = trpc.session.getDailyWords.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
+  const utils = trpc.useUtils();
+  const dailyWords = trpc.session.getDailyWords.useQuery(
+    { seed },
+    { refetchOnWindowFocus: false }
+  );
   const wordOfDay = trpc.wordOfDay.getToday.useQuery();
   const recordResult = trpc.session.recordWordResult.useMutation();
 
@@ -64,7 +67,7 @@ export default function LearnPage() {
         <p className="text-danger">Vui lòng đăng nhập để bắt đầu học.</p>
         <Link
           href="/login"
-          className="mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors"
+          className="mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
         >
           Đăng nhập
         </Link>
@@ -79,7 +82,7 @@ export default function LearnPage() {
         <p className="text-muted text-lg">Không có từ mới nào hôm nay.</p>
         <Link
           href="/review"
-          className="mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors"
+          className="mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
         >
           Ôn tập
         </Link>
@@ -90,7 +93,7 @@ export default function LearnPage() {
   const words = dailyWords.data;
 
   return (
-    <div className="flex flex-1 flex-col relative">
+    <div className="relative" style={{ height: "calc(100dvh - 4rem)" }}>
       {/* Progress dots — top right */}
       <div className="absolute top-3 right-4 z-10 flex items-center gap-1.5">
         {words.map((_, i) => (
@@ -107,18 +110,20 @@ export default function LearnPage() {
         ))}
       </div>
 
-      {/* Scrollable feed */}
+      {/* Scrollable feed — TikTok-style snap */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto snap-y snap-mandatory"
-        style={{ scrollSnapType: "y mandatory" }}
+        className="h-full overflow-y-scroll"
+        style={{
+          scrollSnapType: "y mandatory",
+          WebkitOverflowScrolling: "touch",
+        }}
       >
         {/* Word of the Day */}
         {wordOfDay.data && (
           <div
             data-index={-1}
-            className="snap-start flex flex-col"
-            style={{ minHeight: "calc(100vh - 8rem)" }}
+            className="snap-center flex flex-col shrink-0" style={{ height: "calc(100dvh - 4rem)" }}
           >
             <div className="flex flex-1 flex-col items-center justify-center px-6 py-4 text-center">
               <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary mb-4">
@@ -142,8 +147,7 @@ export default function LearnPage() {
           <div
             key={word.id}
             data-index={index}
-            className="snap-start flex flex-col"
-            style={{ minHeight: "calc(100vh - 8rem)" }}
+            className="snap-center flex flex-col shrink-0" style={{ height: "calc(100dvh - 4rem)" }}
           >
             {/* Word display */}
             <WordDisplay
@@ -189,8 +193,7 @@ export default function LearnPage() {
 
         {/* End card */}
         <div
-          className="snap-start flex flex-col items-center justify-center px-4 text-center"
-          style={{ minHeight: "calc(100vh - 8rem)" }}
+          className="snap-center flex flex-col items-center justify-center px-4 text-center h-full"
         >
           <div className="text-6xl mb-6">🎉</div>
           <h2 className="text-3xl font-bold">Hoàn thành!</h2>
@@ -200,15 +203,15 @@ export default function LearnPage() {
           <div className="flex gap-3 mt-8">
             <Link
               href="/review"
-              className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors"
+              className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
             >
               Ôn tập ngay
             </Link>
             <button
               onClick={() => {
                 recordedRef.current.clear();
-                dailyWords.refetch();
-                containerRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                setSeed(Date.now()); // new seed = new query key = fresh words
+                containerRef.current?.scrollTo({ top: 0 });
                 setActiveIndex(0);
               }}
               className="rounded-full bg-card px-6 py-2.5 text-sm font-medium text-foreground hover:bg-card-hover transition-colors cursor-pointer"

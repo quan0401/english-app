@@ -44,7 +44,7 @@ export default function RegisterPage() {
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-8">
+      <div className="w-full max-w-sm space-y-8 rounded-2xl bg-white border border-border shadow-sm p-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">
             Vocab<span className="text-primary">Viet</span>

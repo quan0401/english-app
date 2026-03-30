@@ -36,31 +36,19 @@ function LoginForm() {
     setLoading(true);
     setError("");
 
-    try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (!result || result.error) {
-        setError("Email hoặc mật khẩu không đúng.");
-        setLoading(false);
-        return;
-      }
-
-      // Redirect using window.location to stay on the current origin
-      // (not NEXTAUTH_URL which may be localhost)
-      window.location.href = callbackUrl;
-    } catch {
-      setError("Đã có lỗi xảy ra. Vui lòng thử lại.");
-      setLoading(false);
-    }
+    // Use redirect: true — NextAuth handles cookie + redirect server-side
+    // On failure: redirects back to /login?error=CredentialsSignin (caught by urlError above)
+    // On success: redirects to callbackUrl with proper session cookie
+    signIn("credentials", {
+      email,
+      password,
+      callbackUrl,
+    });
   };
 
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-8">
+      <div className="w-full max-w-sm space-y-8 rounded-2xl bg-white border border-border shadow-sm p-6">
         <div className="text-center">
           <h1 className="text-3xl font-bold">
             Vocab<span className="text-primary">Viet</span>
@@ -112,7 +100,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-background hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
           >
             {loading ? "Đang đăng nhập..." : "Đăng nhập"}
           </button>

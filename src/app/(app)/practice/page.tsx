@@ -61,7 +61,36 @@ export default function PracticePage() {
       <div className="mx-auto max-w-lg px-4 py-6 space-y-4">
         <h1 className="text-3xl font-bold">Luyện tập</h1>
 
-        {/* Shuffle card — featured */}
+        {/* Learn new words — word feed */}
+        <Link
+          href="/learn"
+          className="w-full rounded-2xl bg-primary/10 border border-primary/20 p-5 flex items-center gap-4 hover:bg-primary/15 transition-colors text-left cursor-pointer block"
+        >
+          <div className="flex-1">
+            <h3 className="text-lg font-bold">📖 Học từ mới</h3>
+            <p className="text-sm text-muted mt-1">Vuốt lên để khám phá từ vựng mới mỗi ngày</p>
+            <div className="mt-3">
+              <span className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-white">
+                Bắt đầu
+              </span>
+            </div>
+          </div>
+          <span className="text-5xl">📚</span>
+        </Link>
+
+        {/* Review — spaced repetition */}
+        <Link
+          href="/review"
+          className="w-full rounded-2xl bg-card p-5 flex items-center gap-4 hover:bg-card-hover transition-colors text-left cursor-pointer block"
+        >
+          <div className="flex-1">
+            <h3 className="text-lg font-bold">🔄 Ôn tập</h3>
+            <p className="text-sm text-muted mt-1">Ôn lại các từ đã học theo lịch trình</p>
+          </div>
+          <span className="text-4xl">🧠</span>
+        </Link>
+
+        {/* Shuffle card */}
         <button
           onClick={() => handleStart("shuffle")}
           className="w-full rounded-2xl bg-card p-5 flex items-center gap-4 hover:bg-card-hover transition-colors text-left cursor-pointer"
@@ -69,13 +98,8 @@ export default function PracticePage() {
           <div className="flex-1">
             <h3 className="text-lg font-bold">🎲 Trộn ngẫu nhiên</h3>
             <p className="text-sm text-muted mt-1">Tổng hợp tất cả trò chơi</p>
-            <div className="mt-3">
-              <span className="rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-background">
-                Bắt đầu
-              </span>
-            </div>
           </div>
-          <span className="text-5xl">🎮</span>
+          <span className="text-4xl">🎮</span>
         </button>
 
         {/* Game grid */}
@@ -84,7 +108,7 @@ export default function PracticePage() {
             <button
               key={game.key}
               onClick={() => handleStart(game.key)}
-              className="flex flex-col rounded-2xl bg-card p-4 hover:bg-card-hover transition-colors text-left cursor-pointer"
+              className="flex flex-col rounded-2xl bg-card border border-border shadow-sm p-4 hover:bg-card-hover transition-colors text-left cursor-pointer"
             >
               <span className="text-3xl mb-3">{game.emoji}</span>
               <span className="font-medium text-sm">{game.name}</span>
@@ -130,7 +154,7 @@ export default function PracticePage() {
         <div className="flex gap-3 mt-8">
           <button
             onClick={() => handleStart(activeGame)}
-            className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors cursor-pointer"
+            className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors cursor-pointer"
           >
             Chơi lại
           </button>

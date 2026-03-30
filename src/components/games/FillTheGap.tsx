@@ -91,7 +91,7 @@ export function FillTheGap({ questions, onResult, onComplete }: FillTheGapProps)
           <button
             onClick={handleSubmit}
             disabled={!input.trim()}
-            className="w-full rounded-xl bg-primary py-3 text-sm font-medium text-background hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
+            className="w-full rounded-xl bg-primary py-3 text-sm font-medium text-white hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
           >
             Kiểm tra
           </button>

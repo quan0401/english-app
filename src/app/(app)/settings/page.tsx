@@ -41,7 +41,7 @@ export default function SettingsPage() {
           <p className="text-danger">Vui lòng đăng nhập.</p>
           <Link
             href="/login"
-            className="inline-block mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors"
+            className="inline-block mt-4 rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
           >
             Đăng nhập
           </Link>
@@ -71,7 +71,7 @@ export default function SettingsPage() {
       <h1 className="text-3xl font-bold">Hồ sơ</h1>
 
       {/* Profile card */}
-      <div className="rounded-2xl bg-card p-5 flex items-center gap-4">
+      <div className="rounded-2xl bg-card border border-border p-5 flex items-center gap-4">
         {user.image ? (
           <img src={user.image} alt="" className="h-14 w-14 rounded-full" />
         ) : (
@@ -89,7 +89,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Level card */}
-      <div className="rounded-2xl bg-card p-5">
+      <div className="rounded-2xl bg-card border border-border p-5">
         <div className="flex items-center justify-between">
           <div>
             <p className="font-semibold">Trình độ {user.cefrLevel}</p>
@@ -105,7 +105,7 @@ export default function SettingsPage() {
         {/* CEFR Level */}
         <button
           onClick={() => setShowLevelPicker(!showLevelPicker)}
-          className="flex flex-col rounded-2xl bg-card p-4 hover:bg-card-hover transition-colors text-left"
+          className="flex flex-col rounded-2xl bg-card border border-border p-4 hover:bg-card-hover transition-colors text-left"
         >
           <span className="text-3xl mb-2">📚</span>
           <span className="font-medium text-sm">Trình độ</span>
@@ -115,7 +115,7 @@ export default function SettingsPage() {
         {/* Daily Goal */}
         <button
           onClick={() => setShowGoalPicker(!showGoalPicker)}
-          className="flex flex-col rounded-2xl bg-card p-4 hover:bg-card-hover transition-colors text-left"
+          className="flex flex-col rounded-2xl bg-card border border-border p-4 hover:bg-card-hover transition-colors text-left"
         >
           <span className="text-3xl mb-2">🎯</span>
           <span className="font-medium text-sm">Mục tiêu</span>
@@ -125,7 +125,7 @@ export default function SettingsPage() {
         {/* Notifications */}
         <button
           onClick={handleEnableNotifications}
-          className="flex flex-col rounded-2xl bg-card p-4 hover:bg-card-hover transition-colors text-left"
+          className="flex flex-col rounded-2xl bg-card border border-border p-4 hover:bg-card-hover transition-colors text-left"
         >
           <span className="text-3xl mb-2">⏰</span>
           <span className="font-medium text-sm">Nhắc nhở</span>
@@ -141,7 +141,7 @@ export default function SettingsPage() {
               uiLanguage: user.uiLanguage === "vi" ? "en" : "vi",
             })
           }
-          className="flex flex-col rounded-2xl bg-card p-4 hover:bg-card-hover transition-colors text-left"
+          className="flex flex-col rounded-2xl bg-card border border-border p-4 hover:bg-card-hover transition-colors text-left"
         >
           <span className="text-3xl mb-2">🌐</span>
           <span className="font-medium text-sm">Ngôn ngữ</span>
@@ -151,9 +151,26 @@ export default function SettingsPage() {
         </button>
       </div>
 
+      {/* Notion integration */}
+      <Link
+        href="/settings/notion"
+        className="flex items-center justify-between rounded-2xl bg-card border border-border p-4 hover:bg-card-hover transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-2xl">📓</span>
+          <div>
+            <div className="font-medium text-sm">Notion</div>
+            <div className="text-xs text-muted">Đồng bộ với Notion</div>
+          </div>
+        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5 text-muted">
+          <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
+        </svg>
+      </Link>
+
       {/* Level picker */}
       {showLevelPicker && (
-        <div className="rounded-2xl bg-card p-4 space-y-3">
+        <div className="rounded-2xl bg-card border border-border p-4 space-y-3">
           <h3 className="text-sm font-medium text-muted">Chọn trình độ</h3>
           <div className="flex gap-2">
             {levels.map((level) => (
@@ -163,7 +180,7 @@ export default function SettingsPage() {
                 className={cn(
                   "rounded-full px-4 py-2 text-sm font-medium transition-colors",
                   user.cefrLevel === level
-                    ? "bg-primary text-background"
+                    ? "bg-primary text-white"
                     : "bg-card-hover text-muted hover:text-foreground"
                 )}
               >
@@ -176,7 +193,7 @@ export default function SettingsPage() {
 
       {/* Goal picker */}
       {showGoalPicker && (
-        <div className="rounded-2xl bg-card p-4 space-y-3">
+        <div className="rounded-2xl bg-card border border-border p-4 space-y-3">
           <h3 className="text-sm font-medium text-muted">
             Mục tiêu: <span className="text-foreground font-bold">{user.dailyGoal} từ/ngày</span>
           </h3>
@@ -197,7 +214,7 @@ export default function SettingsPage() {
       {/* Sign Out */}
       <button
         onClick={() => signOut({ callbackUrl: "/" })}
-        className="w-full rounded-2xl bg-card p-4 text-sm font-medium text-danger hover:bg-card-hover transition-colors"
+        className="w-full rounded-2xl bg-card border border-border p-4 text-sm font-medium text-danger hover:bg-card-hover transition-colors"
       >
         Đăng xuất
       </button>
