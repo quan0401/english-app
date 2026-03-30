@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname),
   },
-  allowedDevOrigins: ["192.168.1.14"],
+  allowedDevOrigins: ["192.168.1.14", "*.ngrok-free.app"],
 };
 
 export default nextConfig;

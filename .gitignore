@@ -38,8 +38,9 @@ yarn-error.log*
 scripts/.crawl-progress.json
 scripts/.improve-examples-progress.json
 
-# claude
+# claude + local docs
 .claude/
+/docs/
 
 # vercel
 .vercel
@@ -49,3 +50,6 @@ scripts/.improve-examples-progress.json
 next-env.d.ts
 
 /src/generated/prisma
+wordweb10/
+Dictionaries.app/
+com.dict.user.prodict_4.1.0.apk
