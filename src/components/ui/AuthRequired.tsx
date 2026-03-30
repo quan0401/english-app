@@ -8,7 +8,7 @@ export function AuthRequired({ message }: { message?: string }) {
       <p className="text-muted text-sm mb-6">{message || "Vui lòng đăng nhập để tiếp tục."}</p>
       <Link
         href="/login"
-        className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors"
+        className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
       >
         Đăng nhập
       </Link>

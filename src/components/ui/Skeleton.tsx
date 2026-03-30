@@ -11,7 +11,7 @@ export function Skeleton({ className, count = 1 }: SkeletonProps) {
       {Array.from({ length: count }).map((_, i) => (
         <div
           key={i}
-          className={cn("animate-pulse rounded-2xl bg-card", className)}
+          className={cn("animate-pulse rounded-2xl bg-gray-100", className)}
         />
       ))}
     </>

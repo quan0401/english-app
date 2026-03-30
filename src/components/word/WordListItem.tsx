@@ -1,8 +1,10 @@
 "use client";
 
 import { useTTS } from "@/hooks/useTTS";
+import { useRouter } from "next/navigation";
 
 interface WordListItemProps {
+  id?: string;
   word: string;
   phonetic: string | null;
   partOfSpeech: string;
@@ -18,18 +20,22 @@ const posLabels: Record<string, string> = {
 };
 
 export function WordListItem({
-  word, phonetic, partOfSpeech, definitionEn, translationVi,
+  id, word, phonetic, partOfSpeech, definitionEn, translationVi,
 }: WordListItemProps) {
   const { speak } = useTTS();
+  const router = useRouter();
 
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-card px-4 py-3 hover:bg-card-hover transition-colors">
+    <div
+      className={`flex items-center gap-3 rounded-xl bg-card border border-border px-4 py-3 transition-colors ${id ? "cursor-pointer hover:bg-card-hover" : ""}`}
+      onClick={() => id && router.push(`/browse/${id}`)}
+    >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-semibold">{word}</span>
           {phonetic && (
             <button
-              onClick={() => speak(word)}
+              onClick={(e) => { e.stopPropagation(); speak(word); }}
               className="inline-flex items-center gap-1 rounded-full bg-card-hover px-2 py-0.5 text-xs text-muted hover:text-foreground transition-colors"
             >
               {phonetic}
@@ -44,7 +50,7 @@ export function WordListItem({
         </p>
         <p className="text-sm text-primary truncate">{translationVi}</p>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
         <button className="text-muted hover:text-primary transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-4 w-4">
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />

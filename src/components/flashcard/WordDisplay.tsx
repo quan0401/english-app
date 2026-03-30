@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useWordActions } from "@/hooks/useWordActions";
+import { trpc } from "@/lib/trpc/client";
 import { SaveToListModal } from "@/components/word/SaveToListModal";
 
 const posLabels: Record<string, string> = {
@@ -26,12 +27,26 @@ export function WordDisplay({
   wordId, word, phonetic, partOfSpeech, definitionEn, translationVi, exampleSentence, showActions = true,
 }: WordDisplayProps) {
   const { isFavorited, isSaved, toggleFavorite, speak } = useWordActions(wordId);
-  const [showExample, setShowExample] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [showNotes, setShowNotes] = useState(false);
 
+  const progressQuery = trpc.progress.getWordProgress.useQuery(
+    { wordId },
+    { enabled: showActions }
+  );
+  const updateNotes = trpc.progress.updateNotes.useMutation({
+    onSuccess: () => progressQuery.refetch(),
+  });
+
+  // Sync notes from server
   useEffect(() => {
-    setShowExample(false);
-  }, [wordId]);
+    if (progressQuery.data?.notes) {
+      setNotes(progressQuery.data.notes);
+    } else {
+      setNotes("");
+    }
+  }, [progressQuery.data?.notes, wordId]);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center px-6 py-4 text-center overflow-y-auto">
@@ -45,7 +60,7 @@ export function WordDisplay({
       {/* Phonetic + speaker */}
       <button
         onClick={() => speak(word)}
-        className="flex items-center gap-2 mt-3 rounded-full bg-card px-4 py-1.5 text-muted hover:text-foreground transition-colors cursor-pointer"
+        className="flex items-center gap-2 mt-3 rounded-full bg-gray-100 border border-border px-4 py-1.5 text-muted hover:text-foreground transition-colors cursor-pointer"
       >
         {phonetic && <span className="text-sm">{phonetic}</span>}
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
@@ -61,54 +76,72 @@ export function WordDisplay({
       {/* Vietnamese */}
       <p className="text-primary font-medium text-base mt-2">{translationVi}</p>
 
+      {/* Example sentence */}
+      <p className="text-sm text-muted italic mt-3 max-w-xs">
+        &ldquo;{exampleSentence}&rdquo;
+      </p>
+
       {/* Action icons */}
       {showActions && (
-        <div className="flex items-center gap-5 mt-6">
-          {/* Info */}
-          <button
-            onClick={() => setShowExample(!showExample)}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-muted hover:text-foreground active:scale-95 transition-all cursor-pointer"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="h-5 w-5">
-              <path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
-            </svg>
-          </button>
+        <div className="flex items-center gap-4 mt-5">
           {/* Pronounce */}
           <button
             onClick={() => speak(word)}
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-card text-muted hover:text-foreground active:scale-95 transition-all cursor-pointer"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 border border-border text-muted hover:text-foreground active:scale-95 transition-all cursor-pointer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="h-5 w-5">
               <path d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0 001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276 2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 01-1.06-1.06 8.25 8.25 0 000-11.668.75.75 0 010-1.06z" />
               <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" />
             </svg>
           </button>
-          {/* Heart — optimistic toggle */}
+          {/* Heart */}
           <button
             onClick={toggleFavorite}
-            className={`flex h-11 w-11 items-center justify-center rounded-full bg-card active:scale-95 transition-all cursor-pointer ${isFavorited ? "text-primary" : "text-muted hover:text-foreground"}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 border border-border active:scale-95 transition-all cursor-pointer ${isFavorited ? "text-primary" : "text-muted hover:text-foreground"}`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill={isFavorited ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={isFavorited ? 0 : 1.5} stroke="currentColor" className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
             </svg>
           </button>
-          {/* Bookmark — save to list */}
+          {/* Bookmark */}
           <button
             onClick={() => setShowSaveModal(true)}
-            className={`flex h-11 w-11 items-center justify-center rounded-full bg-card active:scale-95 transition-all cursor-pointer ${isSaved ? "text-primary" : "text-muted hover:text-foreground"}`}
+            className={`flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 border border-border active:scale-95 transition-all cursor-pointer ${isSaved ? "text-primary" : "text-muted hover:text-foreground"}`}
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill={isSaved ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={isSaved ? 0 : 1.5} stroke="currentColor" className="h-5 w-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
             </svg>
           </button>
+          {/* Notes toggle */}
+          <button
+            onClick={() => setShowNotes(!showNotes)}
+            className={`flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 border border-border active:scale-95 transition-all cursor-pointer ${notes ? "text-primary" : "text-muted hover:text-foreground"}`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill={notes ? "currentColor" : "none"} viewBox="0 0 24 24" strokeWidth={notes ? 0 : 1.5} stroke="currentColor" className="h-5 w-5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+          </button>
         </div>
       )}
 
-      {/* Example sentence */}
-      {showExample && (
-        <p className="text-sm text-muted italic mt-4 max-w-xs">
-          &ldquo;{exampleSentence}&rdquo;
-        </p>
+      {/* Notes input */}
+      {showActions && showNotes && (
+        <div className="w-full max-w-xs mt-4">
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            onBlur={() => {
+              const serverNotes = progressQuery.data?.notes ?? "";
+              if (notes !== serverNotes) {
+                updateNotes.mutate({ wordId, notes: notes || null });
+              }
+            }}
+            placeholder="Ghi chú, mẹo nhớ từ..."
+            rows={2}
+            className="w-full rounded-xl bg-card px-4 py-3 text-sm text-foreground placeholder:text-muted border border-border focus:border-primary focus:outline-none resize-none transition-colors text-left"
+          />
+          {updateNotes.isPending && <p className="text-xs text-muted mt-1">Đang lưu...</p>}
+        </div>
       )}
 
       {/* Save to list modal */}

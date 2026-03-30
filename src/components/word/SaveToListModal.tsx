@@ -49,11 +49,11 @@ export function SaveToListModal({ wordId, onClose }: SaveToListModalProps) {
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center" onClick={onClose}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/40" />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-sm rounded-t-2xl sm:rounded-2xl bg-background border border-border p-5 pb-24 sm:pb-5 space-y-4"
+        className="relative w-full max-w-sm rounded-t-2xl sm:rounded-2xl bg-white border border-border shadow-xl p-5 pb-24 sm:pb-5 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -142,7 +142,7 @@ export function SaveToListModal({ wordId, onClose }: SaveToListModalProps) {
               <button
                 onClick={handleCreate}
                 disabled={!newListName.trim() || createList.isPending}
-                className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
+                className="rounded-xl bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
               >
                 {createList.isPending ? "..." : "Tạo"}
               </button>

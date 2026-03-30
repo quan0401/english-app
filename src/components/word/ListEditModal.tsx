@@ -45,9 +45,9 @@ export function ListEditModal({ listId, currentName, currentIcon, onClose, onDel
 
   return (
     <div className="fixed inset-0 z-60 flex items-end justify-center sm:items-center" onClick={onClose}>
-      <div className="absolute inset-0 bg-black/60" />
+      <div className="absolute inset-0 bg-black/40" />
       <div
-        className="relative w-full max-w-sm rounded-t-2xl sm:rounded-2xl bg-background border border-border p-5 pb-24 sm:pb-5 space-y-4"
+        className="relative w-full max-w-sm rounded-t-2xl sm:rounded-2xl bg-white border border-border shadow-xl p-5 pb-24 sm:pb-5 space-y-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
@@ -94,7 +94,7 @@ export function ListEditModal({ listId, currentName, currentIcon, onClose, onDel
         <button
           onClick={handleSave}
           disabled={!name.trim() || updateList.isPending}
-          className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
+          className="w-full rounded-xl bg-primary py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors disabled:opacity-50 cursor-pointer"
         >
           {updateList.isPending ? "Đang lưu..." : "Lưu thay đổi"}
         </button>

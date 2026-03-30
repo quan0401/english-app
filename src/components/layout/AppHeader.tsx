@@ -10,7 +10,7 @@ export function AppHeader() {
     <>
       <button
         onClick={() => setShowSearch(true)}
-        className="fixed top-4 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 backdrop-blur text-muted hover:text-foreground transition-colors cursor-pointer"
+        className="fixed top-3 right-4 z-40 flex h-10 w-10 items-center justify-center rounded-full bg-card border border-border text-muted hover:text-foreground transition-colors cursor-pointer shadow-sm"
         aria-label="Search"
       >
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">

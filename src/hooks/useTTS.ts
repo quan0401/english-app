@@ -61,8 +61,18 @@ export function useTTS() {
   const speak = useCallback((text: string) => {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
 
+    // Chrome bug: cancel + small delay needed for reliable playback
     window.speechSynthesis.cancel();
+
+    // Chrome also pauses speechSynthesis after ~15s of inactivity, resume it
+    window.speechSynthesis.resume();
+
     const utterance = new SpeechSynthesisUtterance(text);
+
+    // Try to load voices if not yet loaded
+    if (!voiceRef.current) {
+      voiceRef.current = getBestVoice();
+    }
 
     if (voiceRef.current) {
       utterance.voice = voiceRef.current;
@@ -71,7 +81,7 @@ export function useTTS() {
       utterance.lang = "en-US";
     }
 
-    utterance.rate = 0.85;  // slightly slower for learners
+    utterance.rate = 0.85;
     utterance.pitch = 1;
     utterance.onstart = () => setIsSpeaking(true);
     utterance.onend = () => setIsSpeaking(false);

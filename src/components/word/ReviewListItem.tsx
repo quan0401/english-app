@@ -33,7 +33,7 @@ export function ReviewListItem({
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <div className="rounded-lg bg-card overflow-hidden">
+    <div className="rounded-lg bg-card border border-border overflow-hidden">
       {/* Row - tap to expand */}
       <button
         onClick={() => setExpanded(!expanded)}
@@ -60,21 +60,21 @@ export function ReviewListItem({
         </div>
       </button>
 
-      {/* Rating buttons */}
+      {/* Know / Don't know */}
       {expanded && (
-        <div className="grid grid-cols-4 gap-1.5 px-4 pb-3">
-          {ratingButtons.map((btn) => (
-            <button
-              key={btn.key}
-              onClick={() => onRate(btn.key)}
-              className={cn(
-                "rounded-lg border px-2 py-1.5 text-xs font-medium transition-colors",
-                btn.color
-              )}
-            >
-              {btn.label}
-            </button>
-          ))}
+        <div className="flex gap-2 px-4 pb-3">
+          <button
+            onClick={() => onRate("again")}
+            className="flex-1 rounded-lg border border-border py-1.5 text-xs font-medium text-danger hover:bg-card-hover transition-colors cursor-pointer"
+          >
+            Chưa biết
+          </button>
+          <button
+            onClick={() => onRate("good")}
+            className="flex-1 rounded-lg border border-border py-1.5 text-xs font-medium text-success hover:bg-card-hover transition-colors cursor-pointer"
+          >
+            Đã biết
+          </button>
         </div>
       )}
     </div>

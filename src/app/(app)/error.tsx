@@ -26,7 +26,7 @@ export default function AppError({
         <p className="text-muted mb-6">Vui lòng đăng nhập lại.</p>
         <Link
           href="/login"
-          className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors"
+          className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors"
         >
           Đăng nhập
         </Link>
@@ -43,7 +43,7 @@ export default function AppError({
       </p>
       <button
         onClick={reset}
-        className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-background hover:bg-primary-hover transition-colors cursor-pointer"
+        className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white hover:bg-primary-hover transition-colors cursor-pointer"
       >
         Thử lại
       </button>
