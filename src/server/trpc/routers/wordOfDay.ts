@@ -12,25 +12,33 @@ export const wordOfDayRouter = createTRPCRouter({
     });
 
     if (!wotd) {
-      // Pick a word: high frequency, not recently used as WOTD
       const recentWordIds = (
         await ctx.db.wordOfDay.findMany({
           orderBy: { date: "desc" },
-          take: 30,
+          take: 60,
           select: { wordId: true },
         })
       ).map((w) => w.wordId);
 
-      const word = await ctx.db.word.findFirst({
+      // Pick an interesting word: B1-B2 level, not too common, not too rare
+      const candidates = await ctx.db.word.findMany({
         where: {
           id: { notIn: recentWordIds },
-          phonetic: { not: null }, // prefer words with phonetic
-          definitionEn: { not: "" },
+          needsCrawl: false,
+          definitionEn: { not: "[pending]" },
+          translationVi: { not: "[pending]" },
+          phonetic: { not: null },
+          cefrLevel: { in: ["B1", "B2"] },
+          frequency: { gte: 500, lte: 5000 },
         },
+        take: 50,
         orderBy: { frequency: "asc" },
       });
 
-      if (!word) return null;
+      if (candidates.length === 0) return null;
+
+      // Pick randomly from candidates
+      const word = candidates[Math.floor(Math.random() * candidates.length)];
 
       wotd = await ctx.db.wordOfDay.create({
         data: { wordId: word.id, date: today },

@@ -2,12 +2,13 @@ import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "@/server/trpc/init";
 
 const PAGE_SIZE = 20;
+const ENRICHED = { needsCrawl: false } as const; // filter out stub words
 
 export const wordRouter = createTRPCRouter({
   getTopics: publicProcedure.query(async ({ ctx }) => {
     return ctx.db.topic.findMany({
       orderBy: { name: "asc" },
-      include: { _count: { select: { words: true } } },
+      include: { _count: { select: { words: { where: ENRICHED } } } },
     });
   }),
 
@@ -19,15 +20,16 @@ export const wordRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      const where = { topicId: input.topicId, ...ENRICHED };
       const [words, total] = await Promise.all([
         ctx.db.word.findMany({
-          where: { topicId: input.topicId },
+          where,
           orderBy: { frequency: "asc" },
           take: PAGE_SIZE,
           skip: (input.page - 1) * PAGE_SIZE,
           include: { topic: true },
         }),
-        ctx.db.word.count({ where: { topicId: input.topicId } }),
+        ctx.db.word.count({ where }),
       ]);
 
       return {
@@ -46,15 +48,16 @@ export const wordRouter = createTRPCRouter({
       })
     )
     .query(async ({ ctx, input }) => {
+      const where = { cefrLevel: input.level, ...ENRICHED };
       const [words, total] = await Promise.all([
         ctx.db.word.findMany({
-          where: { cefrLevel: input.level },
+          where,
           orderBy: { frequency: "asc" },
           take: PAGE_SIZE,
           skip: (input.page - 1) * PAGE_SIZE,
           include: { topic: true },
         }),
-        ctx.db.word.count({ where: { cefrLevel: input.level } }),
+        ctx.db.word.count({ where }),
       ]);
 
       return {
@@ -74,6 +77,28 @@ export const wordRouter = createTRPCRouter({
       });
     }),
 
+  getFamily: publicProcedure
+    .input(z.object({ wordId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const word = await ctx.db.word.findUnique({
+        where: { id: input.wordId },
+        select: { familyId: true },
+      });
+      if (!word?.familyId) return null;
+
+      const family = await ctx.db.wordFamily.findUnique({
+        where: { id: word.familyId },
+        include: {
+          words: {
+            where: ENRICHED,
+            select: { id: true, word: true, partOfSpeech: true, translationVi: true },
+            orderBy: { frequency: "asc" },
+          },
+        },
+      });
+      return family;
+    }),
+
   getRelated: publicProcedure
     .input(z.object({ wordId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -86,6 +111,7 @@ export const wordRouter = createTRPCRouter({
       return ctx.db.word.findMany({
         where: {
           id: { not: input.wordId },
+          ...ENRICHED,
           OR: [
             ...(word.topicId ? [{ topicId: word.topicId }] : []),
             {
@@ -108,14 +134,15 @@ export const wordRouter = createTRPCRouter({
       page: z.number().min(1).default(1),
     }))
     .query(async ({ ctx, input }) => {
+      const where = { partOfSpeech: input.partOfSpeech, ...ENRICHED };
       const [words, total] = await Promise.all([
         ctx.db.word.findMany({
-          where: { partOfSpeech: input.partOfSpeech },
+          where,
           orderBy: { frequency: "asc" },
           take: PAGE_SIZE,
           skip: (input.page - 1) * PAGE_SIZE,
         }),
-        ctx.db.word.count({ where: { partOfSpeech: input.partOfSpeech } }),
+        ctx.db.word.count({ where }),
       ]);
       return { words, total, totalPages: Math.ceil(total / PAGE_SIZE) };
     }),
@@ -126,6 +153,7 @@ export const wordRouter = createTRPCRouter({
       return ctx.db.word.findMany({
         where: {
           word: { contains: input.query, mode: "insensitive" },
+          ...ENRICHED,
         },
         take: 20,
         orderBy: { frequency: "asc" },
